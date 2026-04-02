@@ -77,73 +77,15 @@ const handleStartQuiz = () => {
         role="group"
         aria-label="Liste des comportements disponibles"
       >
-        <button
-          v-for="module in surveyStore.config.modules"
+        <ModuleButton
+          v-for="(module, index) in surveyStore.config.modules"
           :key="module.behavior"
-          class="flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-300 transform cursor-pointer"
-          :class="{
-            'border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-900/20':
-              surveyStore.isSelected(module.behavior),
-            'border-gray-300 bg-white hover:border-gray-400 hover:translate-x-1 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500':
-              !surveyStore.isSelected(module.behavior),
-          }"
-          :aria-pressed="surveyStore.isSelected(module.behavior)"
-          :aria-label="`${module.name}: ${surveyStore.isSelected(module.behavior) ? 'sélectionné' : 'non sélectionné'}`"
-          @click="handleToggle(module.behavior)"
-        >
-          <!-- Icon -->
-          <div class="w-8 h-8">
-            <Icon
-              :name="module.icon"
-              size="32"
-              :class="{
-                'text-blue-600 dark:text-blue-400': surveyStore.isSelected(
-                  module.behavior,
-                ),
-                'text-gray-600 dark:text-gray-400': !surveyStore.isSelected(
-                  module.behavior,
-                ),
-              }"
-              aria-hidden="true"
-            />
-          </div>
-
-          <!-- Module Name -->
-          <span
-            class="flex-1 text-left text-lg font-medium font-family-inter"
-            :class="{
-              'text-gray-900 dark:text-white': surveyStore.isSelected(
-                module.behavior,
-              ),
-              'text-gray-700 dark:text-gray-300': !surveyStore.isSelected(
-                module.behavior,
-              ),
-            }"
-          >
-            {{ module.name }}
-          </span>
-
-          <!-- Checkbox -->
-          <div class="w-6 h-6">
-            <Icon
-              :name="
-                surveyStore.isSelected(module.behavior)
-                  ? 'lucide:check-circle-2'
-                  : 'lucide:circle'
-              "
-              size="24"
-              :class="{
-                'text-blue-600 dark:text-blue-400': surveyStore.isSelected(
-                  module.behavior,
-                ),
-                'text-gray-400 dark:text-gray-500': !surveyStore.isSelected(
-                  module.behavior,
-                ),
-              }"
-              aria-hidden="true"
-            />
-          </div>
-        </button>
+          :name="module.name"
+          :icon="module.icon"
+          :selected="surveyStore.isSelected(module.behavior)"
+          :index="index"
+          @toggle="handleToggle(module.behavior)"
+        />
       </div>
 
       <!-- CTA Section -->

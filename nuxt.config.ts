@@ -13,6 +13,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   app: {
+    pageTransition: { name: 'slide-bottom', mode: 'out-in' },
     head: {
       htmlAttrs: {
         lang: 'fr',

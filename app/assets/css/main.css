@@ -22,3 +22,26 @@ button:disabled {
   --font-family-inter: 'Inter', system-ui, sans-serif;
   --font-family-poppins: 'Poppins', serif;
 }
+
+.slide-top-enter-active,
+.slide-top-leave-active,
+.slide-bottom-enter-active,
+.slide-bottom-leave-active {
+  transition: all 0.1s linear;
+}
+.slide-top-enter-from {
+  opacity: 0.5;
+  transform: translate(0, -25%);
+}
+.slide-top-leave-to {
+  opacity: 0.5;
+  transform: translate(0, 25%);
+}
+.slide-bottom-enter-from {
+  opacity: 0.5;
+  transform: translate(0, 25%);
+}
+.slide-bottom-leave-to {
+  opacity: 0.5;
+  transform: translate(0, -25%);
+}

@@ -39,11 +39,12 @@ function isSelected(optionId: string): boolean {
     <!-- Options -->
     <div class="flex flex-col gap-3" role="group" :aria-label="question.text">
       <QuizOption
-        v-for="option in question.options"
+        v-for="(option, index) in question.options"
         :key="option.id"
         :text="option.text"
         :selected="isSelected(option.id)"
         :type="question.type"
+        :index="index"
         @select="handleSelect(option.id)"
       />
     </div>
