@@ -55,7 +55,8 @@ npm run lint
 npm run test
 ```
 
-Today, those root commands are fully wired for the frontend. Backend `lint`, `build`, and `test` scripts still need Python tooling before they can be included there.
+Backend `lint` and `test` now run from the root too, as long as `apps/backend/.venv` has been set up with `pip install -r requirements-dev.txt`.
+Backend `build` is still not wired because the Python service does not have a dedicated build step yet.
 
 ---
 

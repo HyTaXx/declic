@@ -4,6 +4,8 @@
   "description": "Declic FastAPI backend",
   "private": true,
   "scripts": {
-    "dev": "[ -x .venv/bin/uvicorn ] || { printf 'Backend environment not set up. Run: cd apps/backend && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt\n' >&2; exit 1; }; .venv/bin/uvicorn main:app --reload"
+    "dev": "[ -x .venv/bin/uvicorn ] || { printf 'Backend environment not set up. Run: cd apps/backend && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements-dev.txt\n' >&2; exit 1; }; .venv/bin/uvicorn main:app --reload",
+    "lint": "[ -x .venv/bin/ruff ] || { printf 'Backend lint dependencies are missing. Run: cd apps/backend && source .venv/bin/activate && pip install -r requirements-dev.txt\n' >&2; exit 1; }; .venv/bin/ruff check .",
+    "test": "[ -x .venv/bin/pytest ] || { printf 'Backend test dependencies are missing. Run: cd apps/backend && source .venv/bin/activate && pip install -r requirements-dev.txt\n' >&2; exit 1; }; .venv/bin/pytest"
   }
 }

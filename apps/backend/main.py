@@ -2,7 +2,7 @@ import os
 
 import resend
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr
@@ -12,7 +12,7 @@ from slowapi.util import get_remote_address
 
 load_dotenv()
 
-resend.api_key = os.environ["RESEND_API_KEY"]
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
 MAIL_FROM = os.environ.get("MAIL_FROM", "onboarding@resend.dev")
 MAIL_SUBJECT = os.environ.get("MAIL_SUBJECT", "Vos résultats Déclic")
@@ -40,6 +40,10 @@ class SendEmailRequest(BaseModel):
 @app.post("/api/send-email")
 @limiter.limit("5/minute")
 async def send_email(request: Request, body: SendEmailRequest) -> JSONResponse:
+    if not RESEND_API_KEY:
+        raise HTTPException(status_code=503, detail="Email service is not configured")
+
+    resend.api_key = RESEND_API_KEY
     resend.Emails.send({
         "from": MAIL_FROM,
         "to": body.email,

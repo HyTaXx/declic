@@ -10,7 +10,7 @@ cd apps/backend
 python3 -m venv .venv
 source .venv/bin/activate
 
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
 cp .env.example .env
 # Fill in RESEND_API_KEY in .env
@@ -25,6 +25,22 @@ npm run dev
 You can also start both apps from the repository root with `npm run dev` once this backend setup is complete.
 
 Server starts at `http://localhost:8000`.
+
+## Lint and test
+
+From the repository root:
+
+```bash
+npm run lint
+npm test
+```
+
+Or from `apps/backend` directly:
+
+```bash
+npm run lint
+npm test
+```
 
 ## Test
 
