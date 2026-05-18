@@ -5,12 +5,12 @@
   "private": true,
   "packageManager": "npm@11.8.0",
   "workspaces": [
-    "apps/frontend",
+    "apps/*",
     "packages/*"
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write .",

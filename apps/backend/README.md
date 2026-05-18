@@ -19,9 +19,10 @@ cp .env.example .env
 ## Run
 
 ```bash
-source .venv/bin/activate
-uvicorn main:app --reload
+npm run dev
 ```
+
+You can also start both apps from the repository root with `npm run dev` once this backend setup is complete.
 
 Server starts at `http://localhost:8000`.
 

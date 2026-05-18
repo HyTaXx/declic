@@ -1,0 +1,9 @@
+{
+  "name": "@declic/backend",
+  "version": "0.0.0",
+  "description": "Declic FastAPI backend",
+  "private": true,
+  "scripts": {
+    "dev": "[ -x .venv/bin/uvicorn ] || { printf 'Backend environment not set up. Run: cd apps/backend && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt\n' >&2; exit 1; }; .venv/bin/uvicorn main:app --reload"
+  }
+}
