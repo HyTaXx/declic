@@ -29,11 +29,23 @@ Install dependencies from the repository root:
 npm ci
 ```
 
-Run the frontend from the repository root:
+Run both frontend and backend from the repository root:
 
 ```bash
 npm run dev
 ```
+
+Before the first backend start, set up its Python environment:
+
+```bash
+cd apps/backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+`npm run dev` will fail with a setup message until `apps/backend/.venv` exists and contains the backend dependencies.
 
 Other root commands:
 
@@ -42,6 +54,9 @@ npm run build
 npm run lint
 npm run test
 ```
+
+Backend `lint` and `test` now run from the root too, as long as `apps/backend/.venv` has been set up with `pip install -r requirements-dev.txt`.
+Backend `build` is still not wired because the Python service does not have a dedicated build step yet.
 
 ---
 
