@@ -1,7 +1,7 @@
 import type {
   ModuleAnswers,
   SurveyModule,
-} from '../../shared/types/survey-types'
+} from '@declic/shared'
 
 export function calculateScore(
   answers: ModuleAnswers,

@@ -4,7 +4,7 @@ import type {
   BehaviorResult,
   ModuleAnswers,
   SurveyModule,
-} from '../../shared/types/survey-types'
+} from '@declic/shared'
 
 describe('Results Functions', () => {
   const mockResults: BehaviorResult[] = [
