@@ -4,9 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      mailServiceId: '',
-      mailTemplateId: '',
-      mailPublicKey: '',
+      apiUrl: 'http://localhost:8000',
       url: '',
     },
   },
