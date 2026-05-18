@@ -52,3 +52,27 @@ Special thanks to the mental health and addiction support communities working to
 ---
 
 **Note**: This platform is a navigation tool, not a replacement for professional medical advice, diagnosis, or treatment. In case of emergency, contact local emergency services immediately.
+
+## Docker
+
+Production container setup is available with Docker Compose.
+
+1. Create your environment file:
+
+```bash
+cp .env.example .env
+```
+
+2. Build and start the app:
+
+```bash
+docker compose up --build -d
+```
+
+3. Open the app at `http://localhost:3000`.
+
+4. Stop the container:
+
+```bash
+docker compose down
+```
