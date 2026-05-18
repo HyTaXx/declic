@@ -1,8 +1,6 @@
 import os
-import smtplib
-import ssl
-from email.message import EmailMessage
 
+import resend
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,11 +12,9 @@ from slowapi.util import get_remote_address
 
 load_dotenv()
 
-SMTP_HOST = os.environ["SMTP_HOST"]
-SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
-SMTP_USER = os.environ["SMTP_USER"]
-SMTP_PASSWORD = os.environ["SMTP_PASSWORD"]
-MAIL_FROM = os.environ.get("MAIL_FROM", SMTP_USER)
+resend.api_key = os.environ["RESEND_API_KEY"]
+
+MAIL_FROM = os.environ.get("MAIL_FROM", "onboarding@resend.dev")
 MAIL_SUBJECT = os.environ.get("MAIL_SUBJECT", "Vos résultats Déclic")
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
 
@@ -44,17 +40,11 @@ class SendEmailRequest(BaseModel):
 @app.post("/api/send-email")
 @limiter.limit("5/minute")
 async def send_email(request: Request, body: SendEmailRequest) -> JSONResponse:
-    msg = EmailMessage()
-    msg["Subject"] = MAIL_SUBJECT
-    msg["From"] = MAIL_FROM
-    msg["To"] = body.email
-    msg.set_content(body.message)
-
-    context = ssl.create_default_context()
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-        server.ehlo()
-        server.starttls(context=context)
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.send_message(msg)
+    resend.Emails.send({
+        "from": MAIL_FROM,
+        "to": body.email,
+        "subject": MAIL_SUBJECT,
+        "text": body.message,
+    })
 
     return JSONResponse({"status": "sent"})

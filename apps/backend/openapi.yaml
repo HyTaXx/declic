@@ -1,0 +1,106 @@
+openapi: 3.1.0
+
+info:
+  title: Declic Mail API
+  version: 1.0.0
+  description: |
+    Sends survey result emails via Resend.
+    Rate limited to **5 requests per minute per IP**.
+
+servers:
+  - url: http://localhost:8000
+    description: Local dev
+  - url: https://api.yourdomain.com
+    description: Production
+
+paths:
+  /api/send-email:
+    post:
+      summary: Send results email
+      description: |
+        Sends a plain-text email to the provided address with the survey results message.
+        Returns 429 if the rate limit (5/min per IP) is exceeded.
+      operationId: sendEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRequest'
+            example:
+              email: user@example.com
+              message: "Bonjour,\n\nVoici le récapitulatif de tes résultats :\n\n📋 Sommeil\nTu dors suffisamment."
+      responses:
+        '200':
+          description: Email sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailResponse'
+              example:
+                status: sent
+        '422':
+          description: Validation error (invalid email format or missing fields)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '429':
+          description: Rate limit exceeded (5 requests/minute per IP)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+              example:
+                error: Rate limit exceeded
+
+components:
+  schemas:
+    SendEmailRequest:
+      type: object
+      required:
+        - email
+        - message
+      properties:
+        email:
+          type: string
+          format: email
+          description: Recipient email address
+          example: user@example.com
+        message:
+          type: string
+          description: Plain-text body of the email
+          example: "Bonjour,\n\nVoici tes résultats."
+
+    SendEmailResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - sent
+          example: sent
+
+    ValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            properties:
+              loc:
+                type: array
+                items:
+                  type: string
+              msg:
+                type: string
+              type:
+                type: string
+
+    RateLimitError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Rate limit exceeded
