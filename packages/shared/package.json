@@ -1,0 +1,11 @@
+{
+  "name": "@declic/shared",
+  "version": "0.0.0",
+  "description": "Shared Declic types and utilities",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./types/survey-types": "./src/types/survey-types.ts"
+  }
+}

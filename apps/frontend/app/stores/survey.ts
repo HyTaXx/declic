@@ -1,3 +1,12 @@
+import type {
+  Behavior,
+  BehaviorQuestion,
+  ModuleAnswers,
+  ModuleProgress,
+  SurveyConfig,
+  SurveyModule,
+} from '@declic/shared'
+
 interface SurveyState {
   config: SurveyConfig | null
   error: string | null

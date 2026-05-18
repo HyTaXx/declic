@@ -1,0 +1,39 @@
+{
+  "name": "@declic/frontend",
+  "version": "0.0.0",
+  "description": "Declic Nuxt frontend",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@declic/shared": "0.0.0",
+    "@emailjs/browser": "^4.4.1",
+    "@nuxt/eslint": "^1.13.0",
+    "@nuxt/fonts": "^0.13.0",
+    "@nuxt/icon": "^2.2.1",
+    "@nuxtjs/color-mode": "^4.0.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@tailwindcss/vite": "^4.1.18",
+    "eslint": "^9.39.2",
+    "jspdf": "^4.0.0",
+    "nuxt": "^4.3.0",
+    "pinia": "^3.0.4",
+    "tailwindcss": "^4.1.18",
+    "vue": "^3.5.27",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.87",
+    "eslint-config-prettier": "^10.1.8",
+    "vitest": "^4.0.18"
+  }
+}

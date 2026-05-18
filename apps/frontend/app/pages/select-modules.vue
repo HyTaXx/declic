@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Behavior } from '@declic/shared'
+
 useHead({
   title: 'Sélection des modules - Declic',
   meta: [

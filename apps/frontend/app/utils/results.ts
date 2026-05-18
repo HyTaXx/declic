@@ -3,7 +3,7 @@ import type {
   BehaviorResult,
   ModuleAnswers,
   SurveyModule,
-} from '../../shared/types/survey-types'
+} from '@declic/shared'
 import { calculateScore } from './scoring'
 
 /**

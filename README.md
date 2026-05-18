@@ -4,6 +4,45 @@
 
 Anonymous addiction screening and resource navigation platform for students.
 
+## Monorepo
+
+This repository uses `npm` workspaces with a lightweight Turborepo setup.
+
+```text
+.
+├── apps/
+│   ├── backend/
+│   └── frontend/
+└── packages/
+    └── shared/
+```
+
+- `apps/frontend`: Nuxt application
+- `apps/backend`: placeholder for the future backend
+- `packages/shared`: shared types
+
+## Development
+
+Install dependencies from the repository root:
+
+```bash
+npm ci
+```
+
+Run the frontend from the repository root:
+
+```bash
+npm run dev
+```
+
+Other root commands:
+
+```bash
+npm run build
+npm run lint
+npm run test
+```
+
 ---
 
 ## 🎯 Overview
