@@ -171,9 +171,9 @@ defineExpose({ openModal })
               v-if="mailStore.statusMessage"
               class="text-sm font-medium p-2 rounded"
               :class="
-                mailStore.statusMessage.includes('Échec')
-                  ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20'
-                  : 'text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-900/20'
+                mailStore.statusMessage === 'Email envoyé avec succès !'
+                  ? 'text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-900/20'
+                  : 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20'
               "
               role="status"
             >

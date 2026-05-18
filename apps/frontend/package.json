@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@declic/shared": "0.0.0",
-    "@emailjs/browser": "^4.4.1",
     "@nuxt/eslint": "^1.13.0",
     "@nuxt/fonts": "^0.13.0",
     "@nuxt/icon": "^2.2.1",

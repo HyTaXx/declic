@@ -18,7 +18,7 @@ This repository uses `npm` workspaces with a lightweight Turborepo setup.
 ```
 
 - `apps/frontend`: Nuxt application
-- `apps/backend`: placeholder for the future backend
+- `apps/backend`: FastAPI mail API
 - `packages/shared`: shared types
 
 ## Development
@@ -34,6 +34,9 @@ Run both frontend and backend from the repository root:
 ```bash
 npm run dev
 ```
+
+Frontend mail requests are sent to the backend API configured by `NUXT_PUBLIC_API_URL`.
+The default local value is `http://localhost:8000`.
 
 Before the first backend start, set up its Python environment:
 

@@ -1,4 +1,3 @@
-import emailjs from '@emailjs/browser'
 import type { ModuleResult } from '~/utils/results'
 
 export const useMailStore = defineStore('mail', {
@@ -55,28 +54,37 @@ export const useMailStore = defineStore('mail', {
 
       try {
         const config = useRuntimeConfig()
+        const apiUrl = config.public.apiUrl.replace(/\/$/, '')
         const message =
           results.length > 0
             ? this.formatResultsForEmail(results)
             : `Bonjour ! Nous avons bien reçu ta demande à l'adresse ${this.email}.`
 
-        const templateParams = {
-          email: this.email,
-          message,
-        }
-
-        await emailjs.send(
-          config.public.mailServiceId as string,
-          config.public.mailTemplateId as string,
-          templateParams,
-          config.public.mailPublicKey as string,
-        )
+        await $fetch(`${apiUrl}/api/send-email`, {
+          method: 'POST',
+          body: {
+            email: this.email,
+            message,
+          },
+        })
 
         this.statusMessage = 'Email envoyé avec succès !'
         return true
       } catch (error) {
-        console.error('EmailJS Error:', error)
-        this.statusMessage = "Échec de l'envoi. Veuillez réessayer."
+        const statusCode =
+          typeof error === 'object' && error !== null && 'statusCode' in error
+            ? Number(error.statusCode)
+            : undefined
+
+        if (statusCode === 429) {
+          this.statusMessage = 'Trop de tentatives. Veuillez réessayer plus tard.'
+        } else if (statusCode === 503) {
+          this.statusMessage = "Le service d'envoi est indisponible."
+        } else {
+          this.statusMessage = "Échec de l'envoi. Veuillez réessayer."
+        }
+
+        console.error('Mail API Error:', error)
         return false
       } finally {
         this.isSending = false
