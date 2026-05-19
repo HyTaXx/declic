@@ -120,6 +120,14 @@ export const useSurveyStore = defineStore('survey', {
       return Math.round(progress)
     },
 
+    canGoBack(): boolean {
+      if (this.currentQuestionIndex > 0) return true
+      const moduleIndex = this.modules.findIndex(
+        (m) => m.behavior === this.currentBehavior,
+      )
+      return moduleIndex > 0
+    },
+
     modulesProgress(): ModuleProgress[] {
       if (!this.config) return []
 
@@ -127,14 +135,14 @@ export const useSurveyStore = defineStore('survey', {
       return this.config.modules
         .filter((moduleRef) => this.selectedBehaviors.has(moduleRef.behavior))
         .map((moduleRef) => {
-          const behavior = moduleRef.behavior
+          const { behavior, name, icon } = moduleRef
           const isCompleted = this.isModuleCompleted(behavior)
           const isCurrent = behavior === this.currentBehavior
 
           return {
             behavior,
-            name: moduleRef.name,
-            icon: moduleRef.icon,
+            name,
+            icon,
             status: isCompleted
               ? 'completed'
               : isCurrent
@@ -156,7 +164,7 @@ export const useSurveyStore = defineStore('survey', {
             ? config.public.url
             : useRequestURL().origin
         const url = `${baseUrl}/data/survey-config.json`
-        this.config = await $fetch(url)
+        this.config = await $fetch<SurveyConfig>(url)
       } catch (err) {
         this.error =
           err instanceof Error ? err.message : 'Unknown error occurred'
@@ -199,14 +207,12 @@ export const useSurveyStore = defineStore('survey', {
 
       if (question.type === 'SINGLE_CHOICE') {
         moduleAnswers.answers[question.id] = [optionId]
+      } else if (currentAnswers.includes(optionId)) {
+        moduleAnswers.answers[question.id] = currentAnswers.filter(
+          (id) => id !== optionId,
+        )
       } else {
-        if (currentAnswers.includes(optionId)) {
-          moduleAnswers.answers[question.id] = currentAnswers.filter(
-            (id) => id !== optionId,
-          )
-        } else {
-          moduleAnswers.answers[question.id] = [...currentAnswers, optionId]
-        }
+        moduleAnswers.answers[question.id] = [...currentAnswers, optionId]
       }
     },
 
@@ -235,6 +241,21 @@ export const useSurveyStore = defineStore('survey', {
       this.modules.push(module)
 
       return module
+    },
+
+    goToPreviousQuestion() {
+      if (this.currentQuestionIndex > 0) {
+        this.currentQuestionIndex--
+        return
+      }
+      const moduleIndex = this.modules.findIndex(
+        (m) => m.behavior === this.currentBehavior,
+      )
+      const prevModule = moduleIndex > 0 ? this.modules[moduleIndex - 1] : undefined
+      if (prevModule) {
+        this.currentBehavior = prevModule.behavior
+        this.currentQuestionIndex = prevModule.questions.length - 1
+      }
     },
 
     resetQuiz() {

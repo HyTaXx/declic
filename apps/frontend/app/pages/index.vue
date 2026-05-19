@@ -64,10 +64,7 @@ await callOnce('survey-config', () => surveyStore.loadConfig())
         <div class="w-5 h-5">
           <Icon name="lucide:clock" size="20" aria-hidden="true" />
         </div>
-        <span
-          >Environ
-          {{ surveyStore.config.estimatedDurationMinutes }} minutes</span
-        >
+        <span>Environ 1 min par module sélectionné</span>
       </div>
 
       <NuxtLink

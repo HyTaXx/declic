@@ -45,7 +45,7 @@ onMounted(() => {
 
     <!-- Module Name -->
     <span
-      class="flex-1 text-left text-lg font-medium font-family-inter"
+      class="flex-1 text-left text-sm font-medium font-family-inter"
       :class="{
         'text-gray-900 dark:text-white': selected,
         'text-gray-700 dark:text-gray-300': !selected,

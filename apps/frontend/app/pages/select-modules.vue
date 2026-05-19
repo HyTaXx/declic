@@ -75,7 +75,7 @@ const handleStartQuiz = () => {
 
       <!-- Module List -->
       <div
-        class="flex flex-col gap-3"
+        class="grid grid-cols-2 gap-3"
         role="group"
         aria-label="Liste des comportements disponibles"
       >
@@ -92,6 +92,27 @@ const handleStartQuiz = () => {
 
       <!-- CTA Section -->
       <nav class="flex flex-col gap-4 mt-4">
+        <div
+          v-if="surveyStore.hasSelection && surveyStore.config"
+          class="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-family-inter"
+        >
+          <Icon name="lucide:clock" size="16" aria-hidden="true" />
+          <span>
+            Durée estimée :
+            ~{{
+              Math.max(
+                1,
+                Math.ceil(
+                  surveyStore.selectedCount *
+                    (surveyStore.config.estimatedDurationMinutes /
+                      surveyStore.config.modules.length),
+                ),
+              )
+            }}
+            min
+          </span>
+        </div>
+
         <button
           :disabled="!surveyStore.hasSelection"
           class="w-full px-8 py-4 font-semibold rounded-lg transition-all duration-300 transform"

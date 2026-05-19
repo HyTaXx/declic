@@ -34,7 +34,7 @@ const handleDownloadPDF = () => {
 }
 
 const handleRestart = () => {
-  router.push('/')
+  router.push('/select-modules')
 }
 
 // Email modal
@@ -82,6 +82,8 @@ const handleOpenEmailModal = () => {
           :module-name="result.moduleName"
           :icon="result.icon"
           :result-text="result.result.text"
+          :severity="result.severity"
+          :behavior="result.behavior"
         />
       </section>
 
@@ -103,7 +105,7 @@ const handleOpenEmailModal = () => {
         </button>
 
         <button
-          class="w-full px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:border-gray-400 hover:-translate-y-0.5 dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-500 transition-all duration-300 transform"
+          class="w-full px-8 py-4 border border-gray-300 text-gray-600 font-medium rounded-lg hover:border-gray-400 hover:text-gray-900 dark:border-gray-600 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:text-gray-200 transition-all duration-300"
           @click="handleRestart"
         >
           Recommencer le quiz
@@ -111,7 +113,7 @@ const handleOpenEmailModal = () => {
 
         <NuxtLink
           to="/"
-          class="text-center text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white font-family-inter py-2"
+          class="text-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 font-family-inter py-2"
         >
           Retour à l'accueil
         </NuxtLink>
