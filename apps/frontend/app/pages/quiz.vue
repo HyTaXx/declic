@@ -12,6 +12,7 @@ useHead({
 
 const router = useRouter()
 const surveyStore = useSurveyStore()
+const showModuleComplete = ref(false)
 
 // Load first module
 const module = await surveyStore.loadNextModule()
@@ -31,6 +32,10 @@ async function nextQuestion() {
   if (surveyStore.currentQuestionIndex < module.questions.length - 1) {
     surveyStore.setCurrentQuestionIndex(surveyStore.currentQuestionIndex + 1)
   } else {
+    showModuleComplete.value = true
+    await new Promise((resolve) => setTimeout(resolve, 900))
+    showModuleComplete.value = false
+
     const nextModule = await surveyStore.loadNextModule()
     if (nextModule) {
       surveyStore.setCurrentBehavior(nextModule.behavior)
@@ -52,10 +57,33 @@ const progress = computed(() => {
 </script>
 
 <template>
-  <div
-    v-if="surveyStore.currentModule && surveyStore.currentQuestion"
-    class="flex flex-col min-h-dvh p-6"
-  >
+  <div class="flex flex-col min-h-dvh">
+    <!-- Module complete overlay -->
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-300 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="showModuleComplete"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      >
+        <div class="flex flex-col items-center gap-3 bg-white dark:bg-gray-800 rounded-2xl px-10 py-8 shadow-2xl">
+          <Icon name="lucide:check-circle-2" size="48" class="text-emerald-500" aria-hidden="true" />
+          <p class="text-lg font-semibold font-family-poppins text-gray-900 dark:text-white">
+            Module terminé !
+          </p>
+        </div>
+      </div>
+    </Transition>
+
+    <div
+      v-if="surveyStore.currentModule && surveyStore.currentQuestion"
+      class="flex flex-col min-h-dvh p-6"
+    >
     <main class="flex flex-col max-w-3xl mx-auto w-full gap-8 flex-1">
       <!-- Progress Bar -->
       <ProgressBar />
@@ -121,5 +149,6 @@ const progress = computed(() => {
         </NuxtLink>
       </nav>
     </main>
+    </div>
   </div>
 </template>
