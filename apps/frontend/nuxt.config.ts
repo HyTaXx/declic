@@ -1,11 +1,20 @@
+import { loadEnv } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
+
+// Monorepo root .env (relative to apps/frontend, where Nuxt runs)
+const monorepoEnvDir = '../..'
+// '' mode loads .env + .env.local from monorepo root
+const env = loadEnv('', monorepoEnvDir, '')
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      apiUrl: 'http://localhost:8000',
-      url: '',
+      mailServiceId: env.NUXT_PUBLIC_MAIL_SERVICE_ID || '',
+      mailTemplateId: env.NUXT_PUBLIC_MAIL_TEMPLATE_ID || '',
+      mailPublicKey: env.NUXT_PUBLIC_MAIL_PUBLIC_KEY || '',
+      apiUrl: env.NUXT_PUBLIC_API_URL || '',
+      backendUrl: env.NUXT_PUBLIC_BACKEND_URL || '',
     },
   },
   compatibilityDate: '2025-07-15',
@@ -77,6 +86,7 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    envDir: monorepoEnvDir,
     plugins: [tailwindcss()],
   },
 })

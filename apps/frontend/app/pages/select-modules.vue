@@ -14,6 +14,7 @@ useHead({
 
 const surveyStore = useSurveyStore()
 const router = useRouter()
+const config = useRuntimeConfig()
 
 surveyStore.resetQuiz()
 
@@ -27,6 +28,13 @@ const handleToggle = (behavior: Behavior) => {
 // Navigation handler
 const handleStartQuiz = () => {
   if (surveyStore.hasSelection) {
+    const behaviors = Array.from(surveyStore.selectedBehaviors)
+    if (config.public.backendUrl) {
+      $fetch(`${config.public.backendUrl}/api/analytics/votes`, {
+        method: 'POST',
+        body: { behaviors },
+      }).catch(() => {})
+    }
     router.push('/quiz')
   }
 }
