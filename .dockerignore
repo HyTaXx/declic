@@ -3,6 +3,7 @@ node_modules
 .output
 .nitro
 .cache
+.turbo
 dist
 .data
 .git
@@ -11,6 +12,11 @@ dist
 .idea
 logs
 *.log
+.venv
+venv
+__pycache__
+.pytest_cache
+.ruff_cache
 .env
 .env.*
 !.env.example

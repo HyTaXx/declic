@@ -112,24 +112,69 @@ Special thanks to the mental health and addiction support communities working to
 
 ## Docker
 
-Production container setup is available with Docker Compose.
+The repo includes separate Dockerfiles for the frontend and backend:
 
-1. Create your environment file:
+- `apps/frontend/Dockerfile`
+- `apps/backend/Dockerfile`
+
+Local production-like startup is available with Docker Compose.
+
+1. Create the frontend env file:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Build and start the app:
+2. Create the backend env file:
+
+```bash
+cp apps/backend/.env.example apps/backend/.env
+```
+
+3. Fill in `apps/backend/.env` with your `RESEND_API_KEY`.
+
+4. Build and start both services:
 
 ```bash
 docker compose up --build -d
 ```
 
-3. Open the app at `http://localhost:3000`.
+5. Open the frontend at `http://localhost:3000`.
 
-4. Stop the container:
+6. Stop the containers:
 
 ```bash
 docker compose down
 ```
+
+The frontend sends email requests to the backend using `NUXT_PUBLIC_API_URL`. In Docker Compose, this is set to `http://localhost:8000`, so browser requests still resolve correctly from your machine.
+
+## Railway
+
+Railway deployment should use 2 services: one for the Nuxt frontend and one for the FastAPI backend.
+
+### Frontend service
+
+- Root directory / build context: repository root
+- Dockerfile path: `apps/frontend/Dockerfile`
+- Public environment variables:
+
+```bash
+NUXT_PUBLIC_API_URL=https://<your-backend-service>.up.railway.app
+NUXT_PUBLIC_URL=https://<your-frontend-service>.up.railway.app
+```
+
+### Backend service
+
+- Root directory / build context: repository root
+- Dockerfile path: `apps/backend/Dockerfile`
+- Environment variables:
+
+```bash
+RESEND_API_KEY=re_...
+MAIL_FROM=onboarding@resend.dev
+MAIL_SUBJECT=Vos résultats Déclic
+ALLOWED_ORIGINS=https://<your-frontend-service>.up.railway.app
+```
+
+Railway provides `PORT` automatically. The backend Dockerfile runs Uvicorn on that port, and the frontend Dockerfile runs Nitro on its assigned port.
