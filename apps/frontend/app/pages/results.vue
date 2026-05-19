@@ -34,7 +34,7 @@ const handleDownloadPDF = () => {
 }
 
 const handleRestart = () => {
-  router.push('/')
+  router.push('/select-modules')
 }
 
 // Email modal
@@ -83,6 +83,7 @@ const handleOpenEmailModal = () => {
           :icon="result.icon"
           :result-text="result.result.text"
           :severity="result.severity"
+          :behavior="result.behavior"
         />
       </section>
 

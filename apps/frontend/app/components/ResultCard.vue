@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import type { Behavior } from '@declic/shared'
+import { BEHAVIOR_RESOURCES } from '~/utils/resources'
+
 const props = defineProps<{
   moduleName: string
   icon: string
   resultText: string
   severity: 'low' | 'medium' | 'high'
+  behavior: Behavior
 }>()
+
+const resource = computed(() => BEHAVIOR_RESOURCES[props.behavior])
 
 const severityConfig = computed(() => {
   if (props.severity === 'low')
@@ -63,5 +69,16 @@ const severityConfig = computed(() => {
     >
       {{ resultText }}
     </p>
+
+    <a
+      v-if="resource"
+      :href="resource.url"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+    >
+      <Icon name="lucide:external-link" size="14" aria-hidden="true" />
+      {{ resource.label }}
+    </a>
   </article>
 </template>
