@@ -19,6 +19,53 @@ const BEHAVIOR_LABELS: Record<Behavior, string> = {
   OVERWORK: 'Surmenage',
 }
 
+type Hotline = { name: string; phone: string; website?: string; hours?: string }
+
+const BEHAVIOR_HOTLINES: Partial<Record<Behavior, Hotline[]>> = {
+  ALCOHOL: [
+    { name: 'Alcool Info Service', phone: '0980 980 930', website: 'https://www.alcool-info-service.fr', hours: '7j/7, 8h-2h' },
+  ],
+  CANNABIS: [
+    { name: 'Drogues Info Service', phone: '0800 23 13 13', website: 'https://www.drogues-info-service.fr', hours: '7j/7, 8h-2h' },
+  ],
+  TOBACCO: [
+    { name: 'Tabac Info Service', phone: '39 89', website: 'https://www.tabac-info-service.fr', hours: 'Lun-Sam, 8h-20h' },
+  ],
+  MEDICATION: [
+    { name: 'Drogues Info Service', phone: '0800 23 13 13', website: 'https://www.drogues-info-service.fr', hours: '7j/7, 8h-2h' },
+  ],
+  PARTY_DRUGS: [
+    { name: 'Drogues Info Service', phone: '0800 23 13 13', website: 'https://www.drogues-info-service.fr', hours: '7j/7, 8h-2h' },
+  ],
+  GAMBLING: [
+    { name: 'Joueurs Info Service', phone: '09 74 75 13 13', website: 'https://www.joueurs-info-service.fr', hours: '7j/7, 8h-2h' },
+  ],
+  SOCIAL_MEDIA: [
+    { name: 'Fil Santé Jeunes', phone: '3114', website: 'https://www.filsantejeunes.com', hours: '7j/7, 9h-23h' },
+  ],
+  VIDEO_GAMES: [
+    { name: 'Fil Santé Jeunes', phone: '3114', website: 'https://www.filsantejeunes.com', hours: '7j/7, 9h-23h' },
+  ],
+  PORNOGRAPHY: [
+    { name: 'Fil Santé Jeunes', phone: '3114', website: 'https://www.filsantejeunes.com', hours: '7j/7, 9h-23h' },
+  ],
+  SNACKING: [
+    { name: 'Anorexie Boulimie Info', phone: '0810 037 037', website: 'https://www.anorexieboulimie-afdas.fr', hours: 'Lun-Ven, 9h-20h' },
+  ],
+  OVERWORK: [
+    { name: 'Numéro national prévention suicide', phone: '3114', hours: '7j/7, 24h/24' },
+  ],
+}
+
+const fallbackHotlines = computed<Hotline[]>(() => {
+  const seen = new Set<string>()
+  return props.behaviors.flatMap((b) => BEHAVIOR_HOTLINES[b] ?? []).filter((h) => {
+    if (seen.has(h.phone)) return false
+    seen.add(h.phone)
+    return true
+  })
+})
+
 const BEHAVIOR_COLORS: Record<Behavior, string> = {
   ALCOHOL:      'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   CANNABIS:     'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
@@ -358,12 +405,44 @@ onUnmounted(() => {
     <div class="flex gap-4" style="min-height: 420px">
       <!-- Centers list (left) -->
       <div ref="listContainer" class="w-64 shrink-0 flex flex-col gap-2 overflow-y-auto" style="max-height: 420px">
-        <p
+        <div
           v-if="resolvedLocation && !isSearching && centers.length === 0"
-          class="text-sm text-gray-500 dark:text-gray-400 text-center py-4"
+          class="flex flex-col gap-3"
         >
-          Aucun centre trouvé dans un rayon de {{ radiusKm }} km. Essayez d'augmenter le rayon.
-        </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
+            Aucun centre trouvé dans un rayon de {{ radiusKm }} km.
+          </p>
+          <div v-if="fallbackHotlines.length > 0" class="flex flex-col gap-2">
+            <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              Lignes d'aide nationales
+            </p>
+            <div
+              v-for="hotline in fallbackHotlines"
+              :key="hotline.phone"
+              class="flex flex-col gap-1 p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20"
+            >
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ hotline.name }}</span>
+              <a
+                :href="`tel:${hotline.phone}`"
+                class="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-medium"
+              >
+                <Icon name="lucide:phone" size="13" />{{ hotline.phone }}
+              </a>
+              <p v-if="hotline.hours" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <Icon name="lucide:clock" size="11" />{{ hotline.hours }}
+              </p>
+              <a
+                v-if="hotline.website"
+                :href="hotline.website"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+              >
+                <Icon name="lucide:external-link" size="11" />Site web
+              </a>
+            </div>
+          </div>
+        </div>
         <ul v-else-if="resolvedLocation && !isSearching && centers.length > 0" class="flex flex-col gap-2">
           <li
             v-for="center in centers"
