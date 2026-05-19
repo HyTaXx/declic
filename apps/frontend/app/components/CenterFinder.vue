@@ -164,7 +164,7 @@ async function setupMap() {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19,
   }).addTo(leafletMap)
-  markersLayer = (L as any).markerClusterGroup({ maxClusterRadius: 40 }).addTo(leafletMap)
+  markersLayer = ((L as unknown) as { markerClusterGroup: (opts: unknown) => import('leaflet.markercluster').MarkerClusterGroup }).markerClusterGroup({ maxClusterRadius: 40 }).addTo(leafletMap)
 }
 
 async function updateMapMarkers(lat: number, lon: number) {
@@ -470,6 +470,19 @@ onUnmounted(() => {
           <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
             Aucun centre trouvé dans un rayon de {{ radiusKm }} km.
           </p>
+          <div v-if="radiusKm < 50" class="flex flex-col gap-2">
+            <p class="text-xs text-gray-400 dark:text-gray-500 text-center">Élargir la recherche :</p>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <button
+                v-for="target in ([Math.min(radiusKm * 2, 50), Math.min(radiusKm * 3, 50), 50] as number[]).filter((v, i, arr) => v > radiusKm && arr.indexOf(v) === i)"
+                :key="target"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors"
+                @click="radiusKm = target; onRadiusChange()"
+              >
+                {{ target }} km
+              </button>
+            </div>
+          </div>
           <div v-if="fallbackHotlines.length > 0" class="flex flex-col gap-2">
             <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
               Lignes d'aide nationales
