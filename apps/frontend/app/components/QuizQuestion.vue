@@ -30,12 +30,13 @@ function isSelected(optionId: string): boolean {
       >
         {{ question.subtitle }}
       </p>
-      <p
+      <span
         v-if="question.type === 'MULTIPLE_CHOICE'"
-        class="text-sm text-gray-500 dark:text-gray-400 font-family-inter"
+        class="inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-medium font-family-inter"
       >
+        <Icon name="lucide:layers" size="12" aria-hidden="true" />
         Plusieurs réponses possibles
-      </p>
+      </span>
     </div>
 
     <!-- Options -->
