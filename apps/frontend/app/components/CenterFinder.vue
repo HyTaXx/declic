@@ -53,6 +53,9 @@ let markersLayer: import('leaflet').LayerGroup | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 const centerMarkers = new Map<string, import('leaflet').Marker>()
 const hoveredCenterId = ref<string | null>(null)
+const activeCenterId = ref<string | null>(null)
+const listContainer = ref<HTMLElement | null>(null)
+const itemRefs = new Map<string, HTMLElement>()
 
 let L: typeof import('leaflet') | null = null
 
@@ -106,7 +109,9 @@ async function updateMapMarkers(lat: number, lon: number) {
 
   markersLayer.clearLayers()
   centerMarkers.clear()
+  itemRefs.clear()
   hoveredCenterId.value = null
+  activeCenterId.value = null
 
   const userIcon = L.divIcon({
     html: '<div style="width:14px;height:14px;background:#3b82f6;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>',
@@ -131,6 +136,7 @@ async function updateMapMarkers(lat: number, lon: number) {
     const marker = L.marker([center.lat, center.lon], { icon: centerIcon })
       .bindPopup(popupLines, { maxWidth: 260 })
       .addTo(markersLayer)
+    marker.on('click', () => scrollToCenter(center.id))
     centerMarkers.set(center.id, marker)
   }
 
@@ -230,9 +236,18 @@ function getDirectionsUrl(center: Center): string {
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}`
 }
 
+function scrollToCenter(centerId: string) {
+  activeCenterId.value = centerId
+  const el = itemRefs.get(centerId)
+  if (el && listContainer.value) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+}
+
 function focusCenter(center: Center) {
   const marker = centerMarkers.get(center.id)
   if (!marker || !leafletMap) return
+  activeCenterId.value = center.id
   leafletMap.setView([center.lat, center.lon], 15, { animate: true })
   marker.openPopup()
 }
@@ -342,7 +357,7 @@ onUnmounted(() => {
     <!-- Map + list side by side -->
     <div class="flex gap-4" style="min-height: 420px">
       <!-- Centers list (left) -->
-      <div class="w-64 shrink-0 flex flex-col gap-2 overflow-y-auto" style="max-height: 420px">
+      <div ref="listContainer" class="w-64 shrink-0 flex flex-col gap-2 overflow-y-auto" style="max-height: 420px">
         <p
           v-if="resolvedLocation && !isSearching && centers.length === 0"
           class="text-sm text-gray-500 dark:text-gray-400 text-center py-4"
@@ -353,10 +368,13 @@ onUnmounted(() => {
           <li
             v-for="center in centers"
             :key="center.id"
+            :ref="(el) => { if (el) itemRefs.set(center.id, el as HTMLElement) }"
             class="flex flex-col gap-1 p-3 rounded-lg border transition-colors cursor-pointer"
-            :class="hoveredCenterId === center.id
+            :class="activeCenterId === center.id
               ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-900/20'
-              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-emerald-400 dark:hover:border-emerald-500'"
+              : hoveredCenterId === center.id
+                ? 'border-emerald-400 bg-emerald-50/50 dark:border-emerald-500 dark:bg-emerald-900/10'
+                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'"
             @click="focusCenter(center)"
             @mouseenter="onCenterHover(center.id)"
             @mouseleave="onCenterHover(null)"
