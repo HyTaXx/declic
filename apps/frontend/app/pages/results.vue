@@ -2,6 +2,7 @@
 import { computeAllResults } from '~/utils/results'
 import { generateResultsPDF } from '~/utils/pdfGenerator'
 import EmailModal from '~/components/EmailModal.vue'
+import CenterFinder from '~/components/CenterFinder.vue'
 
 useHead({
   title: 'Résultats - Declic',
@@ -36,6 +37,12 @@ const handleDownloadPDF = () => {
 const handleRestart = () => {
   router.push('/select-modules')
 }
+
+const mediumHighBehaviors = computed(() =>
+  results.value
+    .filter((r) => r.severity === 'medium' || r.severity === 'high')
+    .map((r) => r.behavior),
+)
 
 // Email modal
 const emailModal = ref<InstanceType<typeof EmailModal> | null>(null)
@@ -86,6 +93,12 @@ const handleOpenEmailModal = () => {
           :behavior="result.behavior"
         />
       </section>
+
+      <!-- Center Finder -->
+      <CenterFinder
+        v-if="mediumHighBehaviors.length > 0"
+        :behaviors="mediumHighBehaviors"
+      />
 
       <!-- Actions -->
       <nav class="flex flex-col gap-4 mt-4">
