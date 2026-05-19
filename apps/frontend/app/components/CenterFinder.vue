@@ -103,9 +103,15 @@ const showSuggestions = ref(false)
 const isFetchingSuggestions = ref(false)
 
 let leafletMap: import('leaflet').Map | null = null
-let markersLayer: import('leaflet').LayerGroup | null = null
+let markersLayer: import('leaflet.markercluster').MarkerClusterGroup | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
+let sliderDebounceTimer: ReturnType<typeof setTimeout> | null = null
 const centerMarkers = new Map<string, import('leaflet').Marker>()
+const resultsCache = new Map<string, Center[]>()
+
+function cacheKey(lat: number, lon: number, radius: number): string {
+  return `${lat.toFixed(4)}|${lon.toFixed(4)}|${radius}|${[...props.behaviors].sort().join(',')}`
+}
 const hoveredCenterId = ref<string | null>(null)
 const activeCenterId = ref<string | null>(null)
 const listContainer = ref<HTMLElement | null>(null)
@@ -149,13 +155,16 @@ async function setupMap() {
   if (!mapContainer.value) return
   L = (await import('leaflet')).default
   await import('leaflet/dist/leaflet.css')
+  await import('leaflet.markercluster')
+  await import('leaflet.markercluster/dist/MarkerCluster.css')
+  await import('leaflet.markercluster/dist/MarkerCluster.Default.css')
 
   leafletMap = L.map(mapContainer.value).setView([FRANCE_LAT, FRANCE_LON], FRANCE_ZOOM)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19,
   }).addTo(leafletMap)
-  markersLayer = L.layerGroup().addTo(leafletMap)
+  markersLayer = (L as any).markerClusterGroup({ maxClusterRadius: 40 }).addTo(leafletMap)
 }
 
 async function updateMapMarkers(lat: number, lon: number) {
@@ -208,12 +217,25 @@ async function updateMapMarkers(lat: number, lon: number) {
 
 async function search(lat: number, lon: number, label: string) {
   resolvedLocation.value = { lat, lon, label }
-  isSearching.value = true
   error.value = ''
+
+  const key = cacheKey(lat, lon, radiusKm.value)
+  const cached = resultsCache.get(key)
+
+  if (cached) {
+    centers.value = cached
+    await nextTick()
+    await updateMapMarkers(lat, lon)
+    return
+  }
+
+  isSearching.value = true
   centers.value = []
 
   try {
-    centers.value = await fetchNearbyCenters(lat, lon, radiusKm.value, props.behaviors)
+    const result = await fetchNearbyCenters(lat, lon, radiusKm.value, props.behaviors)
+    resultsCache.set(key, result)
+    centers.value = result
     await nextTick()
     await updateMapMarkers(lat, lon)
   } catch {
@@ -278,10 +300,12 @@ async function searchByGeolocation() {
   })
 }
 
-async function onRadiusChange() {
-  if (resolvedLocation.value) {
-    await search(resolvedLocation.value.lat, resolvedLocation.value.lon, resolvedLocation.value.label)
-  }
+function onRadiusChange() {
+  if (!resolvedLocation.value) return
+  if (sliderDebounceTimer) clearTimeout(sliderDebounceTimer)
+  sliderDebounceTimer = setTimeout(async () => {
+    await search(resolvedLocation.value!.lat, resolvedLocation.value!.lon, resolvedLocation.value!.label)
+  }, 500)
 }
 
 function getDirectionsUrl(center: Center): string {
@@ -314,6 +338,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (debounceTimer) clearTimeout(debounceTimer)
+  if (sliderDebounceTimer) clearTimeout(sliderDebounceTimer)
+  resultsCache.clear()
   leafletMap?.remove()
   leafletMap = null
   markersLayer = null
@@ -395,7 +421,7 @@ onUnmounted(() => {
         max="50"
         step="1"
         class="flex-1 accent-emerald-500"
-        @change="onRadiusChange"
+        @input="onRadiusChange"
       />
       <span class="text-sm font-medium text-gray-700 dark:text-gray-300 w-14 text-right">
         {{ radiusKm }} km
