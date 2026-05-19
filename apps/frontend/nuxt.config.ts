@@ -80,6 +80,7 @@ export default defineNuxtConfig({
         'lucide:map-pin',
         'lucide:clock',
         'lucide:mail',
+        'lucide:navigation',
       ],
     },
   },

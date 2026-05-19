@@ -223,6 +223,13 @@ async function onRadiusChange() {
   }
 }
 
+function getDirectionsUrl(center: Center): string {
+  const dest = center.address && center.city
+    ? `${center.address}, ${center.postcode ?? ''} ${center.city}`.trim()
+    : `${center.lat},${center.lon}`
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}`
+}
+
 function focusCenter(center: Center) {
   const marker = centerMarkers.get(center.id)
   if (!marker || !leafletMap) return
@@ -390,6 +397,18 @@ onUnmounted(() => {
               <Icon name="lucide:clock" size="11" class="shrink-0 mt-0.5" />
               <span>{{ center.openingHours }}</span>
             </p>
+
+            <!-- Itinéraire -->
+            <a
+              :href="getDirectionsUrl(center)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 mt-1 px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors self-start"
+              @click.stop
+            >
+              <Icon name="lucide:navigation" size="11" />
+              Y aller
+            </a>
 
             <!-- Contacts -->
             <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1">
