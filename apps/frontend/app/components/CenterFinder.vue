@@ -52,10 +52,45 @@ let leafletMap: import('leaflet').Map | null = null
 let markersLayer: import('leaflet').LayerGroup | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 const centerMarkers = new Map<string, import('leaflet').Marker>()
+const hoveredCenterId = ref<string | null>(null)
+
+let L: typeof import('leaflet') | null = null
+
+function makeCenterIcon(hovered = false) {
+  if (!L) return undefined
+  return L.divIcon({
+    html: hovered
+      ? '<div style="width:20px;height:20px;background:#059669;border-radius:50%;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,.5);transform:translate(-3px,-3px)"></div>'
+      : '<div style="width:14px;height:14px;background:#10b981;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>',
+    className: '',
+    iconSize: hovered ? [20, 20] : [14, 14],
+    iconAnchor: hovered ? [10, 10] : [7, 7],
+  })
+}
+
+function onCenterHover(centerId: string | null) {
+  if (!L) return
+
+  // Reset previous hovered marker
+  if (hoveredCenterId.value) {
+    const prev = centerMarkers.get(hoveredCenterId.value)
+    const icon = makeCenterIcon(false)
+    if (prev && icon) prev.setIcon(icon)
+  }
+
+  hoveredCenterId.value = centerId
+
+  // Highlight new hovered marker
+  if (centerId) {
+    const marker = centerMarkers.get(centerId)
+    const icon = makeCenterIcon(true)
+    if (marker && icon) marker.setIcon(icon)
+  }
+}
 
 async function setupMap() {
   if (!mapContainer.value) return
-  const L = (await import('leaflet')).default
+  L = (await import('leaflet')).default
   await import('leaflet/dist/leaflet.css')
 
   leafletMap = L.map(mapContainer.value).setView([FRANCE_LAT, FRANCE_LON], FRANCE_ZOOM)
@@ -67,11 +102,11 @@ async function setupMap() {
 }
 
 async function updateMapMarkers(lat: number, lon: number) {
-  if (!leafletMap || !markersLayer) return
-  const L = (await import('leaflet')).default
+  if (!leafletMap || !markersLayer || !L) return
 
   markersLayer.clearLayers()
   centerMarkers.clear()
+  hoveredCenterId.value = null
 
   const userIcon = L.divIcon({
     html: '<div style="width:14px;height:14px;background:#3b82f6;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>',
@@ -79,12 +114,7 @@ async function updateMapMarkers(lat: number, lon: number) {
     iconSize: [14, 14],
     iconAnchor: [7, 7],
   })
-  const centerIcon = L.divIcon({
-    html: '<div style="width:14px;height:14px;background:#10b981;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>',
-    className: '',
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
-  })
+  const centerIcon = makeCenterIcon(false)!
 
   L.marker([lat, lon], { icon: userIcon }).bindPopup('Votre position').addTo(markersLayer)
 
@@ -316,8 +346,13 @@ onUnmounted(() => {
           <li
             v-for="center in centers"
             :key="center.id"
-            class="flex flex-col gap-1 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors"
+            class="flex flex-col gap-1 p-3 rounded-lg border transition-colors cursor-pointer"
+            :class="hoveredCenterId === center.id
+              ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-900/20'
+              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-emerald-400 dark:hover:border-emerald-500'"
             @click="focusCenter(center)"
+            @mouseenter="onCenterHover(center.id)"
+            @mouseleave="onCenterHover(null)"
           >
             <!-- Nom + distance -->
             <div class="flex items-start justify-between gap-2">
