@@ -88,6 +88,13 @@ const mapContainer = ref<HTMLElement | null>(null)
 const addressInput = ref('')
 const radiusKm = ref(10)
 const centers = ref<Center[]>([])
+const activeFilter = ref<Behavior | null>(null)
+
+const filteredCenters = computed(() =>
+  activeFilter.value
+    ? centers.value.filter((c) => c.behaviors.includes(activeFilter.value!))
+    : centers.value,
+)
 const isSearching = ref(false)
 const error = ref('')
 const resolvedLocation = ref<{ lat: number; lon: number; label: string } | null>(null)
@@ -159,6 +166,7 @@ async function updateMapMarkers(lat: number, lon: number) {
   itemRefs.clear()
   hoveredCenterId.value = null
   activeCenterId.value = null
+  activeFilter.value = null
 
   const userIcon = L.divIcon({
     html: '<div style="width:14px;height:14px;background:#3b82f6;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>',
@@ -401,6 +409,30 @@ onUnmounted(() => {
     </div>
     <p v-else-if="error" class="text-sm text-red-500 dark:text-red-400">{{ error }}</p>
 
+    <!-- Filtres par behavior (si plusieurs addictions et résultats) -->
+    <div v-if="props.behaviors.length > 1 && centers.length > 0 && !isSearching" class="flex flex-wrap gap-2">
+      <button
+        class="px-3 py-1 rounded-full text-xs font-medium transition-colors"
+        :class="activeFilter === null
+          ? 'bg-emerald-600 text-white'
+          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+        @click="activeFilter = null"
+      >
+        Tous ({{ centers.length }})
+      </button>
+      <button
+        v-for="b in props.behaviors"
+        :key="b"
+        class="px-3 py-1 rounded-full text-xs font-medium transition-colors"
+        :class="activeFilter === b
+          ? 'bg-emerald-600 text-white'
+          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+        @click="activeFilter = b"
+      >
+        {{ BEHAVIOR_LABELS[b] }} ({{ centers.filter(c => c.behaviors.includes(b)).length }})
+      </button>
+    </div>
+
     <!-- Map + list side by side -->
     <div class="flex gap-4" style="min-height: 420px">
       <!-- Centers list (left) -->
@@ -445,7 +477,7 @@ onUnmounted(() => {
         </div>
         <ul v-else-if="resolvedLocation && !isSearching && centers.length > 0" class="flex flex-col gap-2">
           <li
-            v-for="center in centers"
+            v-for="center in filteredCenters"
             :key="center.id"
             :ref="(el) => { if (el) itemRefs.set(center.id, el as HTMLElement) }"
             class="flex flex-col gap-1 p-3 rounded-lg border transition-colors cursor-pointer"
