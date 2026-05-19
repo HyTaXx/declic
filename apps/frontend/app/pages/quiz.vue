@@ -105,6 +105,14 @@ const progress = computed(() => {
           Suivant
         </button>
 
+        <button
+          v-if="surveyStore.canGoBack"
+          class="w-full px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:border-gray-400 hover:-translate-y-0.5 dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-500 transition-all duration-300 transform"
+          @click="surveyStore.goToPreviousQuestion()"
+        >
+          Retour
+        </button>
+
         <NuxtLink
           to="/select-modules"
           class="text-center text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white font-family-inter"

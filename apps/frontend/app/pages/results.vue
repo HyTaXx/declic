@@ -82,6 +82,7 @@ const handleOpenEmailModal = () => {
           :module-name="result.moduleName"
           :icon="result.icon"
           :result-text="result.result.text"
+          :severity="result.severity"
         />
       </section>
 

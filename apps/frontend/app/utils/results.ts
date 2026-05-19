@@ -14,6 +14,7 @@ export interface ModuleResult {
   moduleName: string
   icon: string
   result: BehaviorResult
+  severity: 'low' | 'medium' | 'high'
 }
 
 /**
@@ -59,11 +60,21 @@ export function computeAllResults(
     const result = getResultForScore(score, module.results)
 
     if (result) {
+      const sortedResults = [...module.results].sort((a, b) => a.value - b.value)
+      const resultIndex = sortedResults.findIndex((r) => r.id === result.id)
+      const severity =
+        resultIndex === 0
+          ? 'low'
+          : resultIndex === sortedResults.length - 1
+            ? 'high'
+            : 'medium'
+
       results.push({
         behavior: module.behavior,
         moduleName: module.name,
         icon: module.icon,
         result,
+        severity,
       })
     }
   }
