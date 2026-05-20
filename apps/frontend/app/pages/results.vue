@@ -22,8 +22,9 @@ const results = computed(() =>
   computeAllResults(surveyStore.modules, surveyStore.modulesAnswers),
 )
 
-// Redirect if no results (direct navigation or empty state)
-if (results.value.length === 0) {
+// Redirect only on client — SSR runs with an empty Pinia store and would
+// incorrectly send users home right after finishing the quiz.
+if (import.meta.client && results.value.length === 0) {
   await navigateTo('/')
 }
 
@@ -116,6 +117,12 @@ const handleOpenEmailModal = () => {
           class="text-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 font-family-inter py-2"
         >
           Retour à l'accueil
+        </NuxtLink>
+        <NuxtLink
+          to="/analytics"
+          class="text-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-family-inter py-1"
+        >
+          Voir les statistiques anonymes
         </NuxtLink>
       </nav>
     </main>

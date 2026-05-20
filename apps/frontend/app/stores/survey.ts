@@ -6,6 +6,11 @@ import type {
   SurveyConfig,
   SurveyModule,
 } from '@declic/shared'
+import surveyConfigData from '../../public/data/survey-config.json'
+
+const moduleLoaders = import.meta.glob('../../public/data/modules/*.json', {
+  import: 'default',
+}) as Record<string, () => Promise<SurveyModule>>
 
 interface SurveyState {
   config: SurveyConfig | null
@@ -158,13 +163,7 @@ export const useSurveyStore = defineStore('survey', {
       this.error = null
 
       try {
-        const config = useRuntimeConfig()
-        const baseUrl =
-          config.public.url.length > 0
-            ? config.public.url
-            : useRequestURL().origin
-        const url = `${baseUrl}/data/survey-config.json`
-        this.config = await $fetch<SurveyConfig>(url)
+        this.config = surveyConfigData as SurveyConfig
       } catch (err) {
         this.error =
           err instanceof Error ? err.message : 'Unknown error occurred'
@@ -230,14 +229,13 @@ export const useSurveyStore = defineStore('survey', {
 
       if (!nextRef) return null
 
-      const config = useRuntimeConfig()
-      const baseUrl =
-        config.public.url.length > 0
-          ? config.public.url
-          : useRequestURL().origin
-      const url = `${baseUrl}/data/${nextRef.file}`
+      const modulePath = `../../public/data/${nextRef.file}`
+      const loadModule = moduleLoaders[modulePath]
+      if (!loadModule) {
+        throw new Error(`Module file not found: ${nextRef.file}`)
+      }
 
-      const module = await $fetch<SurveyModule>(url)
+      const module = (await loadModule()) as SurveyModule
       this.modules.push(module)
 
       return module
@@ -251,7 +249,8 @@ export const useSurveyStore = defineStore('survey', {
       const moduleIndex = this.modules.findIndex(
         (m) => m.behavior === this.currentBehavior,
       )
-      const prevModule = moduleIndex > 0 ? this.modules[moduleIndex - 1] : undefined
+      const prevModule =
+        moduleIndex > 0 ? this.modules[moduleIndex - 1] : undefined
       if (prevModule) {
         this.currentBehavior = prevModule.behavior
         this.currentQuestionIndex = prevModule.questions.length - 1

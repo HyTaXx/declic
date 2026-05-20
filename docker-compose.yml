@@ -1,4 +1,17 @@
 services:
+  db:
+    image: postgres:16-alpine
+    profiles: ['local']
+    environment:
+      POSTGRES_DB: declic
+      POSTGRES_USER: declic
+      POSTGRES_PASSWORD: declic
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+
   backend:
     build:
       context: .
@@ -29,3 +42,6 @@ services:
     ports:
       - '3000:3000'
     restart: unless-stopped
+
+volumes:
+  postgres_data:
